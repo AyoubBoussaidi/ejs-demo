@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= formData.title %></title>
+  <!-- Include Element UI CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    #app {
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      max-width: 600px;
+      width: 100%;
+    }
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .el-form-item {
+      margin-bottom: 20px;
+    }
+    .el-button {
+      margin-right: 10px;
+    }
+    .el-input, .el-date-picker {
+      width: 100%;
+    }
+  </style>
+</head>
+<body>
+  <h2><%= formData.title %></h2>
+  <div id="app">
+    <el-form ref="form" :model="form" :rules="rules" label-width="120px">
+      <el-form-item v-for="field in fields" :key="field.name" :label="field.label" :prop="field.name">
+        <el-date-picker v-if="field.type==='datetime'"
+          v-model="form[field.name]"
+          :size="field.size"
+          :type="field.type"
+          placeholder="Select date and time">
+        </el-date-picker>
+        <el-input v-if="['text', 'email', 'password'].includes(field.type)" v-model="form[field.name]" :type="field.type" :size="field.size"></el-input>
+      </el-form-item>
+      <el-form-item>
+        <el-button type="primary" @click="onSubmit">Submit</el-button>
+        <el-button @click="onReset">Reset</el-button>
+      </el-form-item>
+    </el-form>
+  </div>
+
+  <script src="https://unpkg.com/vue@2/dist/vue.js"></script>
+  <!-- import JavaScript -->
+  <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+
+  <script>
+    new Vue({
+      el: '#app',
+      data() {
+        return {
+          form: {
+            <% formData.fields.forEach(function(field) { %>
+              <%= field.name %>: '',
+            <% }); %>
+          },
+          fields: <%- JSON.stringify(formData.fields) %>,
+          rules: {
+            <% formData.fields.forEach(function(field) { %>
+              <%= field.name %>: [
+                { required: <%= field.required %>, message: 'Please input <%= field.label %>', trigger: 'change' }
+              ],
+            <% }); %>
+          }
+        }
+      },
+      methods: {
+        onSubmit() {
+          console.log(this.fields);
+          this.$refs.form.validate((valid) => {
+            if (valid) {
+              alert('submit!');
+            } else {
+              console.log('error submit!!');
+              return false;
+            }
+          });
+        },
+        onReset() {
+          this.$refs.form.resetFields();
+        }
+      }
+    });
+  </script>
+</body>
+</html>
